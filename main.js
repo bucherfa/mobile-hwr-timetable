@@ -1,18 +1,19 @@
+const BASE_URL = 'https://ipool.lehre.hwr-berlin.de/api/timetable/v1/data/';
 const LOCALSTORAGE_KEY_PREFERENCES = '__timetable_preferences';
 const LOCALSTORAGE_KEY_CALENDAR = '__timetable_calendar';
 let preferences;
 
 function build() {
   preferences = localStorage.getItem(LOCALSTORAGE_KEY_PREFERENCES) || {
-    baseUrl: 'https://ipool.lehre.hwr-berlin.de/api/timetable/v1/data/',
-    class: null,
+    baseUrl: BASE_URL,
+    course: null,
     ignored: []
   };
   if (typeof preferences === 'string') {
     preferences = JSON.parse(preferences);
   }
-  if (!preferences.class) {
-    preferences.class = window.prompt('Enter your class name:');
+  if (!preferences.course) {
+    preferences.course = window.prompt('Enter your course name such as informatik/semester1/kursa:');
     console.log(preferences)
     localStorage.setItem(LOCALSTORAGE_KEY_PREFERENCES, JSON.stringify(preferences));
   }
@@ -20,15 +21,26 @@ function build() {
 }
 
 function refreshCalendar() {
-  getCalendar(preferences.baseUrl + preferences.class, (calendar, error) => {
+  startLoading();
+  getCalendar(preferences.baseUrl + preferences.course, (calendar, error) => {
     if (error) {
       console.log(error);
       window.alert('Something went wrong!')
+      stopLoading();
       return;
     }
     localStorage.setItem(LOCALSTORAGE_KEY_CALENDAR, JSON.stringify(calendar));
-    console.log(calendar);
+    rebuildCalendar(calendar.events)
+    stopLoading();
   })
+}
+
+function rebuildCalendar(events) {
+  const daysElement = document.querySelector('.days');
+  if (daysElement) {
+    daysElement.remove();
+  }
+  document.querySelector('.main').append(buildDays(events));
 }
 
 function getCalendar(url, callback) {
@@ -101,4 +113,43 @@ function parseEvent(icsEventString) {
   event.break = description[5];
   event.subcategory = description[6];
   return event;
+}
+
+function buildDays(days) {
+  const root = document.createElement('div');
+  root.classList.add('days');
+  const today = todayString();
+  for (const dayString of Object.keys(days)) {
+    const events = days[dayString];
+    if (dayString >= today) {
+      const day = document.createElement('div');
+      day.classList.add('day');
+      root.appendChild(day);
+      const dateElement = document.createElement('div');
+      dateElement.innerText = new Date(dayString).toLocaleString('de-DE', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+      dateElement.classList.add('day__date');
+      day.appendChild(dateElement);
+      const eventsElement = document.createElement('div');
+      day.appendChild(eventsElement);
+      for (const event of events) {
+        const eventElement = document.createElement('div');
+        eventElement.innerText = event.name;
+        eventElement.classList.add('day__event');
+        eventsElement.appendChild(eventElement);
+      }
+    }
+  }
+  return root;
+}
+
+function todayString() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function startLoading() {
+  document.querySelector('.loading').classList.remove('loading--hidden')
+}
+
+function stopLoading() {
+  document.querySelector('.loading').classList.add('loading--hidden')
 }
