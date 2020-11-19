@@ -1,42 +1,50 @@
 const BASE_URL = 'https://ipool.lehre.hwr-berlin.de/api/timetable/v1/data/';
-const LOCALSTORAGE_KEY_PREFERENCES = '__timetable_preferences';
+const LOCALSTORAGE_KEY_COURSE = '__timetable_course';
 const LOCALSTORAGE_KEY_CALENDAR = '__timetable_calendar';
-let preferences;
+let localStorageCourse;
+let currentCourse;
+let courseFromUrl;
 
 function build() {
-  preferences = localStorage.getItem(LOCALSTORAGE_KEY_PREFERENCES) || {
-    baseUrl: BASE_URL,
-    course: null,
-    ignored: []
-  };
-  if (typeof preferences === 'string') {
-    preferences = JSON.parse(preferences);
-  }
-  if (!preferences.course) {
-    preferences.course = window.prompt('Enter your course name such as informatik/semester1/kursa:');
-    console.log(preferences)
-    localStorage.setItem(LOCALSTORAGE_KEY_PREFERENCES, JSON.stringify(preferences));
-  }
+  localStorageCourse = localStorage.getItem(LOCALSTORAGE_KEY_COURSE);
+  courseFromUrl = getCourseFromUrl();
+  currentCourse = courseFromUrl || localStorageCourse;
   refreshCalendar();
-}
-
-function tellMe() {
-  window.alert(window.location.href)
 }
 
 function refreshCalendar() {
   startLoading();
-  getCalendar(preferences.baseUrl + preferences.course, (calendar, error) => {
+  getCalendar(`${BASE_URL}${currentCourse}`, (calendar, error) => {
     if (error) {
       console.log(error);
-      window.alert('Something went wrong!')
+      window.alert('Something went wrong!') // TODO offline notification or invalid input
+      const oldVersion = localStorage.getItem(LOCALSTORAGE_KEY_CALENDAR);
+      if (oldVersion) {
+        const calendar = JSON.parse(oldVersion);
+        rebuildCalendar(calendar.events);
+        setMetadata(calendar);
+        // TODO old version restored info
+      }
       stopLoading();
       return;
     }
+    // set default course if no course is already set
+    if (!localStorageCourse && currentCourse) {
+      localStorage.setItem(LOCALSTORAGE_KEY_COURSE, currentCourse);
+    }
+    if (localStorageCourse && courseFromUrl && courseFromUrl !== localStorageCourse) {
+      // TODO offer user to update default course to course from url
+    }
     localStorage.setItem(LOCALSTORAGE_KEY_CALENDAR, JSON.stringify(calendar));
-    rebuildCalendar(calendar.events)
+    rebuildCalendar(calendar.events);
+    setMetadata(calendar);
     stopLoading();
   })
+}
+
+function setMetadata(calendar) {
+  document.querySelector('.version--js').innerText = `Version vom ${calendar._updated}`;
+  document.querySelector('.course--js').innerText = ` | ${currentCourse}`;
 }
 
 function rebuildCalendar(events) {
@@ -156,4 +164,17 @@ function startLoading() {
 
 function stopLoading() {
   document.querySelector('.loading').classList.add('loading--hidden')
+}
+
+function getCourseFromUrl() {
+  let course = location.search.substr(1);
+  if (course) {
+    if (course.startsWith(BASE_URL)) {
+      course = course.split(BASE_URL)[1];
+    }
+    if (course.startsWith('/')) {
+      course = course.slice(1);
+    }
+  }
+  return course;
 }
