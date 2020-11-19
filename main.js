@@ -20,6 +20,10 @@ function build() {
   refreshCalendar();
 }
 
+function tellMe() {
+  window.alert(window.location.href)
+}
+
 function refreshCalendar() {
   startLoading();
   getCalendar(preferences.baseUrl + preferences.course, (calendar, error) => {
