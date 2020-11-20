@@ -111,6 +111,7 @@ main {
 
 .event__detail--secondary {
     color: #00000077;
+    font-size: 0.8rem;
 }
 
 .event__time {

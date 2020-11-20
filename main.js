@@ -141,18 +141,18 @@ function parseEvent(icsEventString) {
   event.start = getTimeFormatted(startDateTimeArray[1].slice(0, 4));
   event.end = getTimeFormatted(icsEvent[2].split(':')[1].split('T')[1].slice(0, 4));
   const description = icsEvent[7].split('\\n').map(item => item.split(': ').slice(1).join(': ').replaceAll('\\', ''));
-  event.type = description[0];
-  event.name = description[1];
+  event.type = description[0].trim();
+  event.name = description[1].trim();
   if (/^[A-Z0-9]{3,}-/.test(description[1])) {
     const nameArray = description[1].split('-')
-    event.id = nameArray.shift();
-    event.name = nameArray.join('-');
+    event.id = nameArray.shift().trim();
+    event.name = nameArray.join('-').trim();
   }
-  event.lecturer = description[2];
-  event.location = description[3];
-  event.note = description[4];
-  event.break = description[5];
-  event.subcategory = description[6];
+  event.lecturer = description[2].trim();
+  event.location = description[3].trim();
+  event.note = description[4].trim();
+  event.break = description[5].trim();
+  event.subcategory = description[6].trim();
   return event;
 }
 
@@ -176,7 +176,7 @@ function buildDays(days) {
         const eventElement = document.createElement('div');
         let main = `<span class="event__detail">${event.name}</span>`;
         if (event.id) {
-          main = `${main} <small class="event__detail event__detail--secondary">(${event.id})</small>`;
+          main = `${main} <span class="event__detail event__detail--secondary">(${event.id})</span>`;
         }
         if (event.type !== '-') {
           main = `${main} ⋅ <span class="event__detail">${event.type}</span>`;
