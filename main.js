@@ -26,28 +26,37 @@ function build() {
 
 function refreshCalendar() {
   if (currentCourse) {
-    startLoading();
-    getCalendar(`${BASE_URL}${currentCourse}`, (calendar, error) => {
-      if (error) {
-        const oldVersion = localStorage.getItem(LOCALSTORAGE_KEY_CALENDAR);
-        if (oldVersion) {
-          const calendar = JSON.parse(oldVersion);
-          rebuildCalendar(calendar.events);
-          setMetadata(calendar);
-          document.querySelector('.header__info').innerText = 'offline';
-        }
-        if (error.message.startsWith('NetworkError')) {
-          document.querySelector('.header__info').innerText = 'ungültiger Plan';
-        }
-        stopLoading();
-        return;
+    if (navigator.offLine) {
+      const oldVersion = localStorage.getItem(LOCALSTORAGE_KEY_CALENDAR);
+      if (oldVersion) {
+        const calendar = JSON.parse(oldVersion);
+        rebuildCalendar(calendar.events);
+        setMetadata(calendar);
       }
-      document.querySelector('.header__info').innerText = '';
-      localStorage.setItem(LOCALSTORAGE_KEY_CALENDAR, JSON.stringify(calendar));
-      rebuildCalendar(calendar.events);
-      setMetadata(calendar);
-      stopLoading();
-    })
+      document.querySelector('.header__info').innerText = 'offline';
+    } else {
+      startLoading();
+      getCalendar(`${BASE_URL}${currentCourse}`, (calendar, error) => {
+        if (error) {
+          const oldVersion = localStorage.getItem(LOCALSTORAGE_KEY_CALENDAR);
+          if (oldVersion) {
+            const calendar = JSON.parse(oldVersion);
+            rebuildCalendar(calendar.events);
+            setMetadata(calendar);
+          }
+          if (error.message.startsWith('NetworkError')) {
+            document.querySelector('.header__info').innerText = 'ungültiger Kurs';
+          }
+          stopLoading();
+          return;
+        }
+        document.querySelector('.header__info').innerText = '';
+        localStorage.setItem(LOCALSTORAGE_KEY_CALENDAR, JSON.stringify(calendar));
+        rebuildCalendar(calendar.events);
+        setMetadata(calendar);
+        stopLoading();
+      })
+    }
   } else {
     showInstructions();
     stopLoading();
