@@ -1,45 +1,56 @@
 const BASE_URL = 'https://ipool.lehre.hwr-berlin.de/api/timetable/v1/data/';
 const LOCALSTORAGE_KEY_COURSE = '__timetable_course';
 const LOCALSTORAGE_KEY_CALENDAR = '__timetable_calendar';
-let localStorageCourse;
 let currentCourse;
-let courseFromUrl;
+
 
 function build() {
-  localStorageCourse = localStorage.getItem(LOCALSTORAGE_KEY_COURSE);
-  courseFromUrl = getCourseFromUrl();
-  currentCourse = courseFromUrl || localStorageCourse;
+  const localStorageCourse = localStorage.getItem(LOCALSTORAGE_KEY_COURSE);
+  const courseFromUrl = getCourseFromUrl();
+  if (localStorageCourse) {
+    currentCourse = localStorageCourse;
+    if (courseFromUrl) {
+      if (localStorageCourse !== courseFromUrl && confirm('Zu neuem Stundenplan wechseln?\n\nneu:\n' + courseFromUrl + '\n\nalt:\n' + localStorageCourse)) {
+        currentCourse = courseFromUrl;
+        localStorage.setItem(LOCALSTORAGE_KEY_COURSE, currentCourse);
+      }
+    }
+  } else {
+    if (courseFromUrl) {
+      currentCourse = courseFromUrl;
+      localStorage.setItem(LOCALSTORAGE_KEY_COURSE, currentCourse);
+    }
+  }
   refreshCalendar();
 }
 
 function refreshCalendar() {
-  startLoading();
-  getCalendar(`${BASE_URL}${currentCourse}`, (calendar, error) => {
-    if (error) {
-      console.log(error);
-      window.alert('Something went wrong!') // TODO offline notification or invalid input
-      const oldVersion = localStorage.getItem(LOCALSTORAGE_KEY_CALENDAR);
-      if (oldVersion) {
-        const calendar = JSON.parse(oldVersion);
-        rebuildCalendar(calendar.events);
-        setMetadata(calendar);
-        // TODO old version restored info
+  if (currentCourse) {
+    startLoading();
+    getCalendar(`${BASE_URL}${currentCourse}`, (calendar, error) => {
+      if (error) {
+        const oldVersion = localStorage.getItem(LOCALSTORAGE_KEY_CALENDAR);
+        if (oldVersion) {
+          const calendar = JSON.parse(oldVersion);
+          rebuildCalendar(calendar.events);
+          setMetadata(calendar);
+          document.querySelector('.header__info').innerText = 'offline';
+        }
+        if (error.message.startsWith('NetworkError')) {
+          document.querySelector('.header__info').innerText = 'ungültiger Plan';
+        }
+        stopLoading();
+        return;
       }
+      localStorage.setItem(LOCALSTORAGE_KEY_CALENDAR, JSON.stringify(calendar));
+      rebuildCalendar(calendar.events);
+      setMetadata(calendar);
       stopLoading();
-      return;
-    }
-    // set default course if no course is already set
-    if (!localStorageCourse && currentCourse) {
-      localStorage.setItem(LOCALSTORAGE_KEY_COURSE, currentCourse);
-    }
-    if (localStorageCourse && courseFromUrl && courseFromUrl !== localStorageCourse) {
-      // TODO offer user to update default course to course from url
-    }
-    localStorage.setItem(LOCALSTORAGE_KEY_CALENDAR, JSON.stringify(calendar));
-    rebuildCalendar(calendar.events);
-    setMetadata(calendar);
+    })
+  } else {
+    showInstructions();
     stopLoading();
-  })
+  }
 }
 
 function setMetadata(calendar) {
@@ -57,7 +68,9 @@ function rebuildCalendar(events) {
 
 function getCalendar(url, callback) {
   fetch(url)
-    .then(response => response.text()).then(ics => {
+    .then(response => {
+      return response.text();
+    }).then(ics => {
       const icsEvents = ics.split('BEGIN:VEVENT\r\n');
       icsEvents.shift();
       const calendar = {};
@@ -117,15 +130,15 @@ function parseEvent(icsEventString) {
   event.start = getTimeFormatted(startDateTimeArray[1].slice(0, 4));
   event.end = getTimeFormatted(icsEvent[2].split(':')[1].split('T')[1].slice(0, 4));
   const description = icsEvent[7].split('\\n').map(item => item.split(': ').slice(1).join(': ').replaceAll('\\', ''));
-  event.type = description[0]; //TODO
+  event.type = description[0];
   event.name = description[1];
   if (/^[A-Z0-9]{3,}-/.test(description[1])) {
     const nameArray = description[1].split('-')
     event.id = nameArray.shift();
     event.name = nameArray.join('-');
   }
-  event.lecturer = description[2]; //TODO
-  event.location = description[3]; //TODO
+  event.lecturer = description[2];
+  event.location = description[3];
   event.note = description[4];
   event.break = description[5];
   event.subcategory = description[6];
@@ -193,14 +206,23 @@ function stopLoading() {
   document.querySelector('.loading').classList.add('loading--hidden')
 }
 
+function showInstructions() {
+  document.querySelector('.instructions').classList.remove('instructions--hidden');
+  document.querySelector('.current-url--js').innerText = window.location.href;
+}
+
 function getCourseFromUrl() {
-  let course = location.search.substr(1);
-  if (course) {
-    if (course.startsWith(BASE_URL)) {
-      course = course.split(BASE_URL)[1];
-    }
-    if (course.startsWith('/')) {
-      course = course.slice(1);
+  const query = location.search;
+  let course;
+  if (query.startsWith('?kurs=')) {
+    course = query.substr(6);
+    if (course) {
+      if (course.startsWith(BASE_URL)) {
+        course = course.split(BASE_URL)[1];
+      }
+      if (course.startsWith('/')) {
+        course = course.slice(1);
+      }
     }
   }
   return course;

@@ -36,6 +36,23 @@ main {
     display: block;
 }
 
+.instructions {
+    padding: 0 0.5rem;
+}
+
+.instructions--hidden {
+    display: none;
+}
+
+.instructions__highlight {
+    background-color: #1b4965;
+    color: white;
+}
+
+.instructions__url {
+    word-break: break-all;
+}
+
 .version {
     display: flex;
     justify-content: flex-end;
