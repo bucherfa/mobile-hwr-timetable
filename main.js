@@ -95,7 +95,7 @@ function getDateFormatted(string) {
 
 function sortObject(object) {
   return Object.keys(object).sort().reduce(function (result, key) {
-    result[key] = object[key];
+    result[key] = object[key].sort((a, b) => { if (a.start < b.start) { return -1 } if (a.start > b.start) { return 1 } return 0; });
     return result;
   }, {});
 }
@@ -117,15 +117,15 @@ function parseEvent(icsEventString) {
   event.start = getTimeFormatted(startDateTimeArray[1].slice(0, 4));
   event.end = getTimeFormatted(icsEvent[2].split(':')[1].split('T')[1].slice(0, 4));
   const description = icsEvent[7].split('\\n').map(item => item.split(': ').slice(1).join(': ').replaceAll('\\', ''));
-  event.type = description[0];
+  event.type = description[0]; //TODO
   event.name = description[1];
   if (/^[A-Z0-9]{3,}-/.test(description[1])) {
     const nameArray = description[1].split('-')
     event.id = nameArray.shift();
     event.name = nameArray.join('-');
   }
-  event.lecturer = description[2];
-  event.location = description[3];
+  event.lecturer = description[2]; //TODO
+  event.location = description[3]; //TODO
   event.note = description[4];
   event.break = description[5];
   event.subcategory = description[6];
@@ -150,7 +150,26 @@ function buildDays(days) {
       day.appendChild(eventsElement);
       for (const event of events) {
         const eventElement = document.createElement('div');
-        eventElement.innerText = event.name;
+        let main = event.name;
+        if (event.type !== '-') {
+          main = `${main} ⋅ ${event.type}`
+        }
+        if (event.location !== '-') {
+          main = `${main} ⋅ ${event.location}`
+        }
+        if (event.lecturer !== '-') {
+          main = `${main} ⋅ ${event.lecturer}`
+        }
+        eventElement.innerHTML = `
+        <div class="event__main">
+          <div class="event__time">
+              <small>${event.start}</small>
+              <small>${event.end}</small>
+          </div>
+          <div>${main}</div>
+        </div>
+        <small class="event__note">${event.note === '-' ? '' : event.note}</small>
+        `;
         eventElement.classList.add('day__event');
         eventsElement.appendChild(eventElement);
       }

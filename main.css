@@ -25,6 +25,7 @@ header {
 .header__icons {
     display: flex;
     align-items: center;
+    margin-right: 0.5rem;
 }
 
 .header__icon {
@@ -61,10 +62,27 @@ main {
 .day__event {
     padding: 0.5rem;
     border-bottom: 1px solid #D4D8D4;
+    display: flex;
+    flex-direction: column;
 }
 
 .day__event:last-child {
     border-bottom: 0;
+}
+
+.event__main {
+    display: flex;
+}
+
+.event__time {
+    display: flex;
+    flex-direction: column;
+    margin-right: 0.5rem;
+}
+
+.event__note {
+    align-self: flex-end;
+    text-align: right;
 }
 
 .loading {
