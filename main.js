@@ -119,6 +119,11 @@ function parseEvent(icsEventString) {
   const description = icsEvent[7].split('\\n').map(item => item.split(': ').slice(1).join(': ').replaceAll('\\', ''));
   event.type = description[0];
   event.name = description[1];
+  if (/^[A-Z0-9]{3,}-/.test(description[1])) {
+    const nameArray = description[1].split('-')
+    event.id = nameArray.shift();
+    event.name = nameArray.join('-');
+  }
   event.lecturer = description[2];
   event.location = description[3];
   event.note = description[4];
