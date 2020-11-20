@@ -56,6 +56,7 @@ function refreshCalendar() {
         setMetadata(calendar);
       }
       document.querySelector('.header__info').innerText = 'offline';
+      stopLoading();
     }
   } else {
     showInstructions();
