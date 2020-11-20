@@ -3,6 +3,7 @@
 ## Features
 
 - displays timetables from https://ipool.lehre.hwr-berlin.de/main.php?action=browse_stundenplaene (ICS/ICal)
+- installable as an app on any device
 - hides past events
 - offline mode
 - easily switch between timetables (limited to one at a time)
