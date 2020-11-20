@@ -1,7 +1,7 @@
 self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open('sw-cache').then(function(cache) {
-      return cache.addAll(['/test-timetable/index.html', '/test-timetable/main.js', '/test-timetable/main.css']);
+      return cache.addAll(['index.html', 'main.js', 'main.css']);
     })
   );
 });
