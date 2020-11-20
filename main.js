@@ -189,12 +189,12 @@ function buildDays(days) {
         }
         eventElement.innerHTML = `
         <div class="event__time">
-          <small>${event.start}</small>
-          <small>${event.end}</small>
+          <span>${event.start}</span>
+          <span>${event.end}</span>
         </div>
         <div class="event__main">
           <div>${main}</div>
-          <small class="event__note">${event.note === '-' ? '' : event.note}</small>
+          <div class="event__note">${event.note === '-' ? '' : event.note}</div>
         </div>
         `;
         eventElement.classList.add('day__event');

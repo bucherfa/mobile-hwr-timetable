@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Timetable</title>
+  <meta name="Description" content="Übersichtliche Stundenplan App für mobile Geräte.">
+  <title>Stundenplan</title>
   <script>
     if('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js');
@@ -25,7 +26,7 @@
 <header>
   <span class="header__title">Stundenplan</span>
   <div class="header__icons">
-    <small class="header__info"></small>
+    <span class="header__info"></span>
     <!-- 'sync-alt' icon from Font Awesome 5, used under Creative Commons Attribution 4.0 International license https://fontawesome.com/license, no changes were made -->
     <svg focusable="false" data-prefix="fas" data-icon="redo" class="header__icon" height="16px" width="16px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" onclick="refreshCalendar()"><path fill="currentColor" d="M500.33 0h-47.41a12 12 0 0 0-12 12.57l4 82.76A247.42 247.42 0 0 0 256 8C119.34 8 7.9 119.53 8 256.19 8.1 393.07 119.1 504 256 504a247.1 247.1 0 0 0 166.18-63.91 12 12 0 0 0 .48-17.43l-34-34a12 12 0 0 0-16.38-.55A176 176 0 1 1 402.1 157.8l-101.53-4.87a12 12 0 0 0-12.57 12v47.41a12 12 0 0 0 12 12h200.33a12 12 0 0 0 12-12V12a12 12 0 0 0-12-12z"/></svg>
   </div>
@@ -33,7 +34,7 @@
 <main class="main">
   <div class="instructions instructions--hidden">
     <p>
-      Setzte den Link zu einer ICS/ICal-Kalenderdatei als 'kurs' Parameter in die URL ein. Generiere den einzusetzenen Link im iPool: <a class="instructions__url" href="https://ipool.lehre.hwr-berlin.de/main.php?action=browse_stundenplaene" target="_blank">https://ipool.lehre.hwr-berlin.de/main.php?action=browse_stundenplaene</a>
+      Setzte den Link zu einer ICS/ICal-Kalenderdatei als 'kurs' Parameter in die URL ein. Generiere den einzusetzenen Link im iPool: <a class="instructions__url" href="https://ipool.lehre.hwr-berlin.de/main.php?action=browse_stundenplaene" target="_blank" rel="noreferrer">https://ipool.lehre.hwr-berlin.de/main.php?action=browse_stundenplaene</a>
     </p>
     <p>
       So sollte die URL aussehen:<br>
@@ -48,14 +49,14 @@
       <span class="instructions__url current-url--js"></span>
     </p>
   </div>
-  <div class="version"><small class="version--js"></small></div>
+  <div class="version"><div class="version--js"></div></div>
   <div class="days"></div>
   <div class="loading">
     <div class="lds-dual-ring"></div>
   </div>
 </main>
 <footer>
-  <div>Version: 0.1.6 | <a href="https://github.com/bucherfa/mobile-hwr-timetable" target="_blank">GitHub</a><span class="course--js"></span></div>
+  <div>Version: 0.1.6 | <a href="https://github.com/bucherfa/mobile-hwr-timetable" target="_blank" rel="noreferrer">GitHub</a><span class="course--js"></span></div>
 </footer>
 </body>
 </html>
