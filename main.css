@@ -8,7 +8,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #4E7E68;
+    background-color: #4e7e68;
     color: #ffffff;
     top: 0;
     left: 0;
@@ -86,9 +86,13 @@ main {
 
 .day__event {
     padding: 0.5rem;
-    border-bottom: 1px solid #D4D8D4;
+    border-bottom: 1px solid #d4d8d4;
     display: flex;
     flex-direction: row;
+}
+
+.day__event--highlight {
+    background-color: #f7f0de;
 }
 
 .day__event:last-child {
@@ -155,8 +159,8 @@ main {
     height: 64px;
     margin: 8px;
     border-radius: 50%;
-    border: 6px solid #FFF;
-    border-color: #FFF transparent #FFF transparent;
+    border: 6px solid #ffffff;
+    border-color: #ffffff transparent #ffffff transparent;
     animation: lds-dual-ring 1.2s linear infinite;
 }
 @keyframes lds-dual-ring {

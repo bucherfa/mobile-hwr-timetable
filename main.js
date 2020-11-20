@@ -198,6 +198,9 @@ function buildDays(days) {
         </div>
         `;
         eventElement.classList.add('day__event');
+        if (event.type === 'Klausur') {
+          eventElement.classList.add('day__event--highlight');
+        }
         eventsElement.appendChild(eventElement);
       }
     }
