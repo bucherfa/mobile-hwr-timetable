@@ -42,6 +42,7 @@ function refreshCalendar() {
         stopLoading();
         return;
       }
+      document.querySelector('.header__info').innerText = '';
       localStorage.setItem(LOCALSTORAGE_KEY_CALENDAR, JSON.stringify(calendar));
       rebuildCalendar(calendar.events);
       setMetadata(calendar);
