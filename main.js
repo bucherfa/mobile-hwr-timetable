@@ -150,25 +150,28 @@ function buildDays(days) {
       day.appendChild(eventsElement);
       for (const event of events) {
         const eventElement = document.createElement('div');
-        let main = event.name;
+        let main = `<span class="event__detail">${event.name}</span>`;
+        if (event.id) {
+          main = `${main} <small class="event__detail event__detail--secondary">(${event.id})</small>`;
+        }
         if (event.type !== '-') {
-          main = `${main} ⋅ ${event.type}`
+          main = `${main} ⋅ <span class="event__detail">${event.type}</span>`;
         }
         if (event.location !== '-') {
-          main = `${main} ⋅ ${event.location}`
+          main = `${main} ⋅ <span class="event__detail">${event.location}</span>`;
         }
         if (event.lecturer !== '-') {
-          main = `${main} ⋅ ${event.lecturer}`
+          main = `${main} ⋅ <span class="event__detail">${event.lecturer}</span>`;
         }
         eventElement.innerHTML = `
-        <div class="event__main">
-          <div class="event__time">
-              <small>${event.start}</small>
-              <small>${event.end}</small>
-          </div>
-          <div>${main}</div>
+        <div class="event__time">
+          <small>${event.start}</small>
+          <small>${event.end}</small>
         </div>
-        <small class="event__note">${event.note === '-' ? '' : event.note}</small>
+        <div class="event__main">
+          <div>${main}</div>
+          <small class="event__note">${event.note === '-' ? '' : event.note}</small>
+        </div>
         `;
         eventElement.classList.add('day__event');
         eventsElement.appendChild(eventElement);
