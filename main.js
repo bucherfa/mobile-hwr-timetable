@@ -26,15 +26,7 @@ function build() {
 
 function refreshCalendar() {
   if (currentCourse) {
-    if (navigator.offLine) {
-      const oldVersion = localStorage.getItem(LOCALSTORAGE_KEY_CALENDAR);
-      if (oldVersion) {
-        const calendar = JSON.parse(oldVersion);
-        rebuildCalendar(calendar.events);
-        setMetadata(calendar);
-      }
-      document.querySelector('.header__info').innerText = 'offline';
-    } else {
+    if (navigator.onLine) {
       startLoading();
       getCalendar(`${BASE_URL}${currentCourse}`, (calendar, error) => {
         if (error) {
@@ -56,6 +48,14 @@ function refreshCalendar() {
         setMetadata(calendar);
         stopLoading();
       })
+    } else {
+      const oldVersion = localStorage.getItem(LOCALSTORAGE_KEY_CALENDAR);
+      if (oldVersion) {
+        const calendar = JSON.parse(oldVersion);
+        rebuildCalendar(calendar.events);
+        setMetadata(calendar);
+      }
+      document.querySelector('.header__info').innerText = 'offline';
     }
   } else {
     showInstructions();
