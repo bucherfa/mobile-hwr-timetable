@@ -10,7 +10,7 @@ function build() {
   if (localStorageCourse) {
     currentCourse = localStorageCourse;
     if (courseFromUrl) {
-      if (localStorageCourse !== courseFromUrl && confirm('Zu neuem Stundenplan wechseln?\n\nneu:\n' + courseFromUrl + '\n\nalt:\n' + localStorageCourse)) {
+      if (localStorageCourse !== courseFromUrl && confirm('Zu neuem Stundenplan wechseln?\n\nalt:\n' + localStorageCourse + '\n\nneu:\n' + courseFromUrl)) {
         currentCourse = courseFromUrl;
         localStorage.setItem(LOCALSTORAGE_KEY_COURSE, currentCourse);
       }
@@ -140,7 +140,7 @@ function parseEvent(icsEventString) {
   event.date = getDateFormatted(startDateTimeArray[0]);
   event.start = getTimeFormatted(startDateTimeArray[1].slice(0, 4));
   event.end = getTimeFormatted(icsEvent[2].split(':')[1].split('T')[1].slice(0, 4));
-  const description = icsEvent[7].split('\\n').map(item => item.split(': ').slice(1).join(': ').replaceAll('\\', ''));
+  const description = icsEvent[7].split('\\n').map(item => item.split(': ').slice(1).join(': ').replace(/\\/g, ''));
   event.type = description[0].trim();
   event.name = description[1].trim();
   if (/^[A-Z0-9]{3,}-/.test(description[1])) {
