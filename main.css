@@ -40,8 +40,6 @@ header {
 
 main {
     display: block;
-    max-width: 768px;
-    margin: auto;
 }
 
 .instructions {
@@ -68,14 +66,23 @@ main {
     font-size: 0.8rem;
 }
 
-.days {
-    margin: 0 0.5rem;
+.weeks {}
+
+.week {
+    display: block;
+    padding: 0.25rem 0.5rem;
+}
+
+.week:nth-child(even) {
+    background-color: #D6D6D6;
 }
 
 .day {
+    background-color: white;
     border-radius: 0.25rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-    margin: 0.5rem 0;
+    margin: 0.5rem auto;
+    max-width: 768px;
 }
 
 .day__date {

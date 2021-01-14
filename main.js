@@ -70,9 +70,9 @@ function setMetadata(calendar) {
 }
 
 function rebuildCalendar(events) {
-  const daysElement = document.querySelector('.days');
-  if (daysElement) {
-    daysElement.remove();
+  const weeksElement = document.querySelector('.weeks');
+  if (weeksElement) {
+    weeksElement.remove();
   }
   document.querySelector('.main').append(buildDays(events));
 }
@@ -158,16 +158,25 @@ function parseEvent(icsEventString) {
 
 function buildDays(days) {
   const root = document.createElement('div');
-  root.classList.add('days');
+  root.classList.add('weeks');
   const today = todayString();
+  let weekElement;
+  let currentWeek = '';
   for (const dayString of Object.keys(days)) {
     const events = days[dayString];
     if (dayString >= today) {
+      if (currentWeek !== getMonday(dayString)) {
+        weekElement = document.createElement('div');
+        root.appendChild(weekElement);
+        weekElement.classList.add('week');
+        currentWeek = getMonday(dayString);
+      }
+      const date = new Date(dayString);
       const day = document.createElement('div');
       day.classList.add('day');
-      root.appendChild(day);
+      weekElement.appendChild(day);
       const dateElement = document.createElement('div');
-      dateElement.innerText = new Date(dayString).toLocaleString('de-DE', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+      dateElement.innerText = date.toLocaleString('de-DE', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
       dateElement.classList.add('day__date');
       day.appendChild(dateElement);
       const eventsElement = document.createElement('div');
@@ -209,7 +218,10 @@ function buildDays(days) {
 }
 
 function todayString() {
-  const date = new Date();
+  return getDateString(new Date());
+}
+
+function getDateString(date) {
   let day = date.getDate();
   if (day < 10) {
     day = '0' + day;
@@ -250,4 +262,11 @@ function getCourseFromUrl() {
     }
   }
   return course;
+}
+
+function getMonday(dateString) {
+  const date = new Date(dateString);
+  const monday = new Date();
+  monday.setDate(date.getDate() - date.getDay() + 1);
+  return getDateString(monday);
 }
